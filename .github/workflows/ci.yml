@@ -26,6 +26,6 @@ jobs:
       - name: Upload Artifact[linux-arm64]
         uses: actions/upload-artifact@v3.1.3
         with:
-          name: N_m3u8DL-RE_Beta_linux-arm64
+          name: N_m3u8DL-RE_Beta_linux-armv7
           path: artifact/N_m3u8DL-RE
 
