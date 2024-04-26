@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
-      - run: dotnet publish src/N_m3u8DL-RE -r linux-arm32 -c Release -p:StripSymbols=true -p:CppCompilerAndLinker=clang-9 -p:SysRoot=/crossrootfs/arm32 -o artifact
+      - run: dotnet publish src/N_m3u8DL-RE -r linux-arm -c Release -p:StripSymbols=true -p:CppCompilerAndLinker=clang-9 -p:SysRoot=/crossrootfs/arm32 -o artifact
 
       - name: Upload Artifact[linux-arm64]
         uses: actions/upload-artifact@v3.1.3
