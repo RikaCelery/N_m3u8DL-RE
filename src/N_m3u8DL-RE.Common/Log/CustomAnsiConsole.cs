@@ -4,40 +4,46 @@ using Spectre.Console;
 
 namespace N_m3u8DL_RE.Common.Log;
 
-public class NonAnsiWriter : TextWriter
+public partial class NonAnsiWriter : TextWriter
 {
     public override Encoding Encoding => Console.OutputEncoding;
 
-    private string lastOut = "";
+    private string? _lastOut = "";
 
     public override void Write(char value)
     {
         Console.Write(value);
     }
 
-    public override void Write(string value)
+    public override void Write(string? value)
     {
-        if (lastOut == value)
+        if (_lastOut == value)
         {
             return;
         }
-        lastOut = value;
+        _lastOut = value;
         RemoveAnsiEscapeSequences(value);
     }
 
-    private void RemoveAnsiEscapeSequences(string input)
+    private void RemoveAnsiEscapeSequences(string? input)
     {
         // Use regular expression to remove ANSI escape sequences
-        string output = Regex.Replace(input, @"\x1B\[(\d+;?)+m", "");
-        output = Regex.Replace(output, @"\[\??\d+[AKlh]", "");
-        output = Regex.Replace(output,"[\r\n] +","");
+        var output = MyRegex().Replace(input ?? "", "");
+        output = MyRegex1().Replace(output, "");
+        output = MyRegex2().Replace(output, "");
         if (string.IsNullOrWhiteSpace(output))
         {
             return;
         }
-        // Implement your custom write logic here, e.g., write to console
         Console.Write(output);
     }
+
+    [GeneratedRegex(@"\x1B\[(\d+;?)+m")]
+    private static partial Regex MyRegex();
+    [GeneratedRegex(@"\[\??\d+[AKlh]")]
+    private static partial Regex MyRegex1();
+    [GeneratedRegex("[\r\n] +")]
+    private static partial Regex MyRegex2();
 }
 
 /// <summary>
@@ -45,30 +51,27 @@ public class NonAnsiWriter : TextWriter
 /// </summary>
 public static class CustomAnsiConsole
 {
-    // var ansiConsoleSettings = new AnsiConsoleSettings();
-    // ansiConsoleSettings.Ansi = AnsiSupport.Yes;
-    public static IAnsiConsole Console { get; set; }
+    public static IAnsiConsole Console { get; set; } = AnsiConsole.Console;
 
-    public static void InitConsole(bool forceAnsi, bool noansi)
+    public static void InitConsole(bool forceAnsi, bool noAnsiColor)
     {
         if (forceAnsi)
         {
             var ansiConsoleSettings = new AnsiConsoleSettings();
-            if (noansi)
+            if (noAnsiColor)
             {
                 ansiConsoleSettings.Out = new AnsiConsoleOutput(new NonAnsiWriter());
             }
 
             ansiConsoleSettings.Interactive = InteractionSupport.Yes;
             ansiConsoleSettings.Ansi = AnsiSupport.Yes;
-            // ansiConsoleSettings.Ansi = AnsiSupport.Yes;
             Console = AnsiConsole.Create(ansiConsoleSettings);
             Console.Profile.Width = int.MaxValue;
         }
         else
         {
             var ansiConsoleSettings = new AnsiConsoleSettings();
-            if (noansi)
+            if (noAnsiColor)
             {
                 ansiConsoleSettings.Out = new AnsiConsoleOutput(new NonAnsiWriter());
             }
